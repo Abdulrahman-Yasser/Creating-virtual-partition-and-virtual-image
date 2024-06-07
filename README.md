@@ -36,9 +36,28 @@ output : ```/dev/loop53```
 - same thing  with rootfs use ```sudo mkfs.ext4 /dev/loop53p2```
 - ```sudo mount /dev/loop53p2 rootfs/```
 
+- To unmount your partitions : ``` sudo umound boot```
+  ``` sudo umount rootfs```
+- ```sudo losetup -d /dev/loop53```
 
+- Right now we have an sdCard, which I can represent my image inside.
 
+# Using my virtual SD card in qemu
+``` sudo qemu-system-arm -M vexpress-a9 -m 128M -nographic -kernel u-boot -sd ../qemu/rpi4_32/sdcard/file.img```
 
+# Now I want to build my kernel
+- download linux
+- ```make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- vexpress_defconfig```
+- ```make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j 30```
+- Now we can try to build it with qemu ```qemu-system-arm -M vexpress-a9 -m 120M -kernel ../linux/arch/arm/boot/zImage -nographic``` It will fail because there is no device tree.
+- Now we can try to build it with qemu ```qemu-system-arm -M vexpress-a9 -m 120M -kernel ../linux/arch/arm/boot/zImage -nographic``` It will fail because there is no device tree.
 
+- Passing dtb (device-tree binary) to the kernel ```sudo qemu-system-arm -M vexpress-a9 -m 128M -nographic -kernel linux/arch/arm/boot/zImage -dtb linux/arch/arm/boot/dts/arm/vexpress-v2p-ca9.dtb```
+It will boot successfully, but it doesn't have any rootfs. So it can't mount rootfs because it doesn't exist. Also there is no bootargs.
+
+- passing the bootargs to the kernel in qemu using ```--append cmdline```
+- ```sudo qemu-system-arm -M vexpress-a9 -m 128M -nographic -kernel linux/arch/arm/boot/zImage -dtb linux/arch/arm/boot/dts/arm/vexpress-v2p-ca9.dtb --append "console=ttyAMA0,115200"``` Again it won't continue because there is no rootfs
+
+# Initramfs
 
 
