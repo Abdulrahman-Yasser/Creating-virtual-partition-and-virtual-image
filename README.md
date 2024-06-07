@@ -59,5 +59,22 @@ It will boot successfully, but it doesn't have any rootfs. So it can't mount roo
 - ```sudo qemu-system-arm -M vexpress-a9 -m 128M -nographic -kernel linux/arch/arm/boot/zImage -dtb linux/arch/arm/boot/dts/arm/vexpress-v2p-ca9.dtb --append "console=ttyAMA0,115200"``` Again it won't continue because there is no rootfs
 
 # Initramfs
+- Initramfs is the minimal root filesystem, which is loaded before the userspace.
+- It's duties to load the urgent kernel modules, recovering if userspace crashed,
+- It can be binary, bash script, or python script.
+
+Your initramfs creation steps will be : 
+         - build your script
+         - move it to initramfs/init/
+         - archive the filesystem into initramfs/
+```
+   arm-linux-gnueabihf-g++ -static -o main main.cpp   //Printing hello world
+   mkdir -p initramfs/init
+   cp main initramfs/init
+   cd initramfs || exit
+   find . | cpio -o -H newc | gzip >../initramfs.cpio.gz    // Get all the files as an input to archiving command
+   cd ..
+```
 
 
+# BusyBox
